@@ -1,0 +1,35 @@
+#herojStatus {
+  left: 30px;
+  top: 30px;
+}
+
+#orkStatus {
+  left: 690px;
+  top: 30px;
+  display: none;
+}
+
+#zmajStatus {
+  left: 30px;
+  top: 190px;
+  display: none;
+}
+
+div {
+  position: absolute;
+  border: solid #4C0000 2px;
+  color: #3D0000;
+  padding: .25em;
+  z-index: 999;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  font-family: Georgia;
+}
+
+#zdravlje {
+  background-color: red;
+}
+
+#ime {
+  color: maroon;
+}
