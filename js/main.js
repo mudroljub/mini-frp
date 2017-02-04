@@ -7,18 +7,19 @@ var ork;
 var zmaj;
 var kutija;
 
-function Karakter(ime, slika, shir, vis) {
-  ovajKarakter = new Sprite(scena, slika, shir, vis);
-  ovajKarakter.ime = ime;
+class Karakter extends Sprite {
+  constructor(ime, slika, shir, vis) {
+    super(scena, slika, shir, vis)
+    this.ime = ime;
+    this.preciznost = 60; // procenat šanse da pogodi protivnika
+    this.udarac = 2; // broj šestostrane kocke za udarac
+    this.eskivaza = 10; // oduzima od protivnikove šanse za udarac
+    this.oklop = 1; // oduzima od protivnikovog demage
+    this.zdravlje = 60; // koliko demage može podneti
+  }
 
-  ovajKarakter.preciznost = 60; // procenat šanse da pogodi protivnika
-  ovajKarakter.udarac = 2; // broj šestostrane kocke za udarac
-  ovajKarakter.eskivaza = 10; // oduzima od protivnikove šanse za udarac
-  ovajKarakter.oklop = 1; // oduzima od protivnikovog demage
-  ovajKarakter.zdravlje = 60; // koliko demage može podneti
-
-  ovajKarakter.pokaziStatistike = function() {
-    status = "<strong><span id='ime'>" + this.ime + "</span></strong> <br />"
+  pokaziStatistike() {
+    let status = "<strong><span id='ime'>" + this.ime + "</span></strong> <br />"
     status += "preciznost: " + this.preciznost + "<br />";
     status += "udarac: " + this.udarac + "<br />";
     status += "eskivaža: " + this.eskivaza + "<br />";
@@ -27,11 +28,11 @@ function Karakter(ime, slika, shir, vis) {
     return status;
   }
 
-  ovajKarakter.borba = function(protivnik) {
-    preciznost = (this.preciznost - protivnik.eskivaza) / 100;
+  borba(protivnik) {
+    let preciznost = (this.preciznost - protivnik.eskivaza) / 100;
     if (Math.random() < preciznost) {
       //alert("Hit!");
-      udarac = 0;
+      let udarac = 0;
       for (i = 0; i < this.udarac; i++) {
         udarac += parseInt(Math.random() * 6);
       }
@@ -45,24 +46,26 @@ function Karakter(ime, slika, shir, vis) {
       }
     }
   }
-  return ovajKarakter;
 }
 
-function Heroj() {
-  ovajHeroj = new Karakter("Heroj", "slike/hero.png", 64, 64);
-  ovajHeroj.setPosition(225, 150);
-  ovajHeroj.loadAnimation(512, 256, 64, 64);
-  ovajHeroj.generateAnimationCycles();
-  ovajHeroj.renameCycles(new Array("gore", "levo", "dole", "desno"));
-  ovajHeroj.setAnimationSpeed(500);
+class Heroj extends Karakter {
+  constructor() {
+    super("Heroj", "slike/hero.png", 64, 64)
+    this.setPosition(225, 150);
+    this.loadAnimation(512, 256, 64, 64);
+    this.generateAnimationCycles();
+    this.renameCycles(new Array("gore", "levo", "dole", "desno"));
+    this.setAnimationSpeed(500);
+    this.pauza();
+  }
 
-  ovajHeroj.pauza = function() {
+  pauza() {
     this.setSpeed(0);
     this.setCurrentCycle("dole");
     this.pauseAnimation();
   }
 
-  ovajHeroj.proveriTipke = function() {
+  proveriTipke() {
     if (keysDown[K_LEFT]) {
       this.setSpeed(2);
       this.playAnimation();
@@ -92,8 +95,7 @@ function Heroj() {
     }
   }
 
-  ovajHeroj.proveriSudare = function() {
-    //prevencija sudara
+  proveriSudare() {
     if (this.collidesWith(ork)) {
       //vraća potez i staje
       this.x -= this.dx;
@@ -123,35 +125,33 @@ function Heroj() {
       heroj.zdravlje++;
     }
   }
-  ovajHeroj.pauza();
-  return ovajHeroj;
 }
 
-function Ork() {
-  ovajOrk = new Karakter("Ork", "slike/ork-animirani.png", 47.25, 48);
-  ovajOrk.setSpeed(0);
-  ovajOrk.setPosition(300, 200);
-  ovajOrk.setPosition(100, 250);
+class Ork extends Karakter {
+  constructor() {
+    super("Ork", "slike/ork-animirani.png", 47.25, 48)
+    this.setSpeed(0);
+    this.setPosition(300, 200);
+    this.setPosition(100, 250);
+    this.loadAnimation(378, 192, 47.25, 48);
+    this.generateAnimationCycles();
+    this.renameCycles(new Array("gore", "levo", "dole", "desno"));
+    this.setAnimationSpeed(500);
+    //ork je izdržljiviji od defaulta ali sa slabijim oružjem
+    this.preciznost = 50; // perc likelihood of hitting opponent
+    this.udarac = 1; // udarac (d6) done on a sucessful hit
+    this.eskivaza = 5; // subtract from opponent's preciznost
+    this.oklop = 1 // subtract from opponent's udarac
+    this.zdravlje = 80; // amount of udarac I can sustain
+  }
 
-  ovajOrk.loadAnimation(378, 192, 47.25, 48);
-  ovajOrk.generateAnimationCycles();
-  ovajOrk.renameCycles(new Array("gore", "levo", "dole", "desno"));
-  ovajOrk.setAnimationSpeed(500);
-
-  //ork je izdržljiviji od defaulta ali sa slabijim oružjem
-  ovajOrk.preciznost = 50; // perc likelihood of hitting opponent
-  ovajOrk.udarac = 1; // udarac (d6) done on a sucessful hit
-  ovajOrk.eskivaza = 5; // subtract from opponent's preciznost
-  ovajOrk.oklop = 1 // subtract from opponent's udarac
-  ovajOrk.zdravlje = 80; // amount of udarac I can sustain
-
-  ovajOrk.pauza = function() {
+  pauza() {
     this.setSpeed(0);
     this.setCurrentCycle("dole");
     this.pauseAnimation();
-  } // kraj
+  }
 
-  ovajOrk.proveriTipke = function() {
+  proveriTipke() {
     if (keysDown[K_J]) {
       this.setSpeed(2);
       this.playAnimation();
@@ -180,36 +180,32 @@ function Ork() {
       this.pauza();
     }
   }
-  //ovajOrk.pauza();
-  return ovajOrk;
 }
 
-function Zmaj() {
-  ovajZmaj = new Karakter("Zmaj", "slike/bahamut.png", 96, 96);
-  ovajZmaj.loadAnimation(384, 384, 96, 96);
-  ovajZmaj.generateAnimationCycles();
-  ovajZmaj.renameCycles(new Array("dole", "levo", "desno", "gore"));
-  ovajZmaj.setAnimationSpeed(500);
+class Zmaj extends Karakter {
+  constructor() {
+    super("Zmaj", "slike/bahamut.png", 96, 96)
+    this.loadAnimation(384, 384, 96, 96);
+    this.generateAnimationCycles();
+    this.renameCycles(new Array("dole", "levo", "desno", "gore"));
+    this.setAnimationSpeed(500);
+    this.preciznost = 33;
+    this.udarac = 3;
+    this.eskivaza = 3;
+    this.oklop = 2
+    this.zdravlje = 100;
+    this.setPosition(400, 30);
+    this.setSpeed(0);
+    this.pauseAnimation();
+  }
 
-  //zmaj statistike
-  ovajZmaj.preciznost = 33;
-  ovajZmaj.udarac = 3;
-  ovajZmaj.eskivaza = 3;
-  ovajZmaj.oklop = 2
-  ovajZmaj.zdravlje = 100;
-
-  //start paused
-  ovajZmaj.setPosition(400, 30);
-  ovajZmaj.setSpeed(0);
-  ovajZmaj.pauseAnimation();
-
-  ovajZmaj.pauza = function() {
+  pauza() {
     this.setSpeed(0);
     this.setCurrentCycle("dole");
     this.pauseAnimation();
   }
 
-  ovajZmaj.proveriTipke = function() {
+  proveriTipke() {
     if (keysDown[K_A]) {
       this.setSpeed(1);
       this.playAnimation();
@@ -239,8 +235,7 @@ function Zmaj() {
     }
   }
 
-  ovajZmaj.proveriSudare = function() {
-    //prevencija sudara
+  proveriSudare() {
     if (this.collidesWith(ork)) {
       //vraća potez i staje
       this.x -= this.dx;
@@ -251,7 +246,6 @@ function Zmaj() {
       document.getElementById("orkStatus").style.display = "block";
     }
   }
-  return ovajZmaj;
 }
 
 function borbaHerojOrk() {
