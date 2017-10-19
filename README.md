@@ -1,4 +1,4 @@
-[![](screen.png)](https://mudroljub.github.io/mini-frp/)
+[![](screen.jpg)](https://mudroljub.github.io/mini-frp/)
 
 # Mini FRP
 
